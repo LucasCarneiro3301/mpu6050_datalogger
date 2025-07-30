@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Nome do arquivo CSV
-csv_file = "arq.csv"  # Altere para o nome do seu arquivo, se necessário
+csv_file = "exemplo.csv"  # Altere para o nome do seu arquivo, se necessário
 
 # Lê o arquivo CSV
 df = pd.read_csv(csv_file)
