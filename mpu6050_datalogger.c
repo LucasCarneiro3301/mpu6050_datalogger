@@ -7,10 +7,7 @@
 SemaphoreHandle_t xCounterSem;     // Semáforo usado para controlar o número de usuários presentes
 SemaphoreHandle_t xDisplayMut;     // Mutex para proteger o acesso ao display
 SemaphoreHandle_t xSensorMut;      // Mutex para proteger o acesso aos dados do MPU6050
-SemaphoreHandle_t xResetSem;       // Semáforo binário usado para sinalizar a tarefa de reset
-SemaphoreHandle_t xSdMut;          // Semáforo para gerenciar o uso do arquivo csv
-TaskHandle_t xSDTaskHandle = NULL;
-UBaseType_t counter = 0;           // Contador de usuários atuais no 
+SemaphoreHandle_t xActSem;       // Semáforo binário usado para sinalizar a tarefa de reset
 
 ssd1306_t ssd;
 
@@ -30,20 +27,14 @@ int main()
 {
     init();
 
-    xCounterSem = xSemaphoreCreateCounting(MAX_USERS, 0);
     xDisplayMut = xSemaphoreCreateMutex();
-    xResetSem = xSemaphoreCreateBinary();
+    xActSem = xSemaphoreCreateBinary();
     xSensorMut = xSemaphoreCreateMutex();
-    xSdMut = xSemaphoreCreateMutex();
 
-    xTaskCreate(vTaskMonitoringScreen, "Monitoring Screen Task",  configMINIMAL_STACK_SIZE + 128, NULL, 1, NULL);    // Exibe status, vagas e total
-    xTaskCreate(vTaskSDControlPanel,        "SD Control Panel Task",  configMINIMAL_STACK_SIZE + 128, NULL, 1,  &xSDTaskHandle);   // Mostra alertas
-    xTaskCreate(vTaskEntrada,      "Entrada Task",        configMINIMAL_STACK_SIZE + 128, NULL, 1, NULL);   // Lida com entradas (acessos)
-    xTaskCreate(vTaskSaida,        "Saída Task",          configMINIMAL_STACK_SIZE + 128, NULL, 1, NULL);   // Lida com saídas (liberações)
-    xTaskCreate(vTaskLed,          "LEDs Task",           configMINIMAL_STACK_SIZE + 128, NULL, 1, NULL);   // Gerencia LEDs de status
-    xTaskCreate(vTaskSDAction,        "SD Action Task",          configMINIMAL_STACK_SIZE + 128, NULL, 1, NULL);   // Responsável por resetar o contador
-    xTaskCreate(vTaskMatrix,       "Matrix Task",         configMINIMAL_STACK_SIZE + 128, NULL, 1, NULL);   // Controla matriz de LEDs (vagas ocupadas)
-    xTaskCreate(vTaskMPU6050,      "MPU6050 Task",        configMINIMAL_STACK_SIZE + 128, NULL, 1, NULL);   // Tarefa que coleta os valores do sensor MPU6050
+    xTaskCreate(vTaskMonitoringScreen, "Monitoring Screen Task",  configMINIMAL_STACK_SIZE + 128, NULL, 1, NULL);       // Monitora dados do MPU6050
+    xTaskCreate(vTaskSDControlPanel,        "SD Control Panel Task",  configMINIMAL_STACK_SIZE + 128, NULL, 1,  NULL);  // Exibe funções relacionadas ao SD
+    xTaskCreate(vTaskSDAction,        "SD Action Task",          configMINIMAL_STACK_SIZE + 128, NULL, 1, NULL);        // Aciona funções relacionadas ao SD
+    xTaskCreate(vTaskMPU6050,      "MPU6050 Task",        configMINIMAL_STACK_SIZE + 128, NULL, 1, NULL);               // Tarefa que coleta os valores do sensor MPU6050
 
     vTaskStartScheduler();
     panic_unsupported();
@@ -53,7 +44,7 @@ int main()
 // ISR do botão
 void gpio_callback(uint gpio, uint32_t events) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;                  // Nenhum contexto de tarefa foi despertado
-    xSemaphoreGiveFromISR(xResetSem, &xHigherPriorityTaskWoken);    // Libera o semáforo
+    xSemaphoreGiveFromISR(xActSem, &xHigherPriorityTaskWoken);    // Libera o semáforo
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);                   // Troca o contexto da tarefa
 }
 

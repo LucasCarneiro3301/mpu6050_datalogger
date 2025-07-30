@@ -10,21 +10,15 @@
 
 extern SemaphoreHandle_t xCounterSem;
 extern SemaphoreHandle_t xDisplayMut;
-extern SemaphoreHandle_t xResetSem;
+extern SemaphoreHandle_t xActSem;
 extern SemaphoreHandle_t xSensorMut;
 extern SemaphoreHandle_t xSdMut;
 extern UBaseType_t counter;
 extern TaskHandle_t xSDTaskHandle;
 
-
-void vTaskEntrada(void *params);
-void vTaskSaida(void *params);
 void vTaskMonitoringScreen(void *params);
 void vTaskSDControlPanel(void *params);
-void vTaskLed(void *params);
 void vTaskSDAction(void *params);
-void vTaskMatrix(void *params);
-void vTaskMatrix(void *params);
 void vTaskMPU6050(void *params);
 
 #endif

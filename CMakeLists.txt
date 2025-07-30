@@ -34,11 +34,7 @@ add_executable(${PROJECT_NAME}
         lib/source/hw_config.c
         lib/source/tasks/sd_control_panel_task.c
         lib/source/tasks/monitoring_screen_task.c
-        lib/source/tasks/task_entrada.c
-        lib/source/tasks/task_saida.c
-        lib/source/tasks/task_leds.c
         lib/source/tasks/sd_action_task.c
-        lib/source/tasks/task_matrix.c
         lib/source/tasks/mpu6050_task.c
         )
 

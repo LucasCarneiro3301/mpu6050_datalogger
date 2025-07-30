@@ -25,7 +25,7 @@ void vTaskSDAction(void *params)
 {
     while(true) 
     {
-        if (xSemaphoreTake(xResetSem, portMAX_DELAY) == pdTRUE) 
+        if (xSemaphoreTake(xActSem, portMAX_DELAY) == pdTRUE) 
         {
             if(sd_status==2) {
                 printf("Gravação concluída!\n");
@@ -255,6 +255,8 @@ void vTaskSDAction(void *params)
 
                                 vTaskDelay(pdMS_TO_TICKS(2000));
 
+                                leds(0,0,0);
+
                                 xSemaphoreGive(xDisplayMut);
                             }
                         }
@@ -298,7 +300,7 @@ void vTaskSDAction(void *params)
                             ssd1306_send_data(&ssd);                                        // Atualiza o display
                             
                             for(int i = 0; i < 10; i++) {
-                                gpio_put(RED, (i+1)%2);
+                                leds((i+1)%2,0,0);
 
                                 vTaskDelay(pdMS_TO_TICKS(200));
                             }
